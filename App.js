@@ -26,7 +26,24 @@ const App = () => {
             showLabel: false,
             iconStyle: { width: 40, alignItems: 'center' },
           }}
+          initialRouteName="Home"
         >
+          <Tab.Screen
+            name="WiFi"
+            component={WifiScreen}
+            options={{
+              tabBarIcon: ({ color }) => <FontAwesome5 name="wifi" size={24} color={color} />,
+              tabBarAccessibilityLabel: 'WiFi',
+            }}
+          />
+          <Tab.Screen
+            name="Trash"
+            component={TrashScreen}
+            options={{
+              tabBarIcon: ({ color }) => <FontAwesome5 name="trash" size={24} color={color} />,
+              tabBarAccessibilityLabel: 'Trash',
+            }}
+          />
           <Tab.Screen
             name="Home"
             component={HomeScreen}
@@ -41,22 +58,6 @@ const App = () => {
             options={{
               tabBarIcon: ({ color }) => <MaterialIcons name="no-meals" size={24} color={color} />,
               tabBarAccessibilityLabel: 'Fasting',
-            }}
-          />
-          <Tab.Screen
-            name="Trash"
-            component={TrashScreen}
-            options={{
-              tabBarIcon: ({ color }) => <FontAwesome5 name="trash" size={24} color={color} />,
-              tabBarAccessibilityLabel: 'Trash',
-            }}
-          />
-          <Tab.Screen
-            name="WiFi"
-            component={WifiScreen}
-            options={{
-              tabBarIcon: ({ color }) => <FontAwesome5 name="wifi" size={24} color={color} />,
-              tabBarAccessibilityLabel: 'WiFi',
             }}
           />
           <Tab.Screen
