@@ -5,6 +5,7 @@ import Constants from 'expo-constants'
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 import HomeScreen from './HomeScreen';
 import FastScreen from './FastScreen';
@@ -74,4 +75,10 @@ const App = () => {
   );
 };
 
-export default App;
+const AppWrapper = () => (
+  <PaperProvider>
+    <App />
+  </PaperProvider>
+);
+
+export default AppWrapper;
