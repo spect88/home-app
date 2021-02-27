@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text, View, ScrollView, StyleSheet, Switch } from 'react-native';
-import { addDays, format, isToday, isTomorrow, endOfDay } from 'date-fns';
+import { Text, View, ScrollView, RefreshControl, StyleSheet, Switch } from 'react-native';
+import { addDays, subDays, format, isToday, isTomorrow, endOfDay, startOfHour } from 'date-fns';
 
-import useAsyncStorage from './useAsyncStorage';
+import useNotifications from './useNotifications';
 import config from './private/config.json';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -37,10 +37,14 @@ const formatDate = date => {
 const TrashScreen = () => {
   const isNightOrMorning = new Date().getHours() < config.trash.collectionTime;
   const startingFrom = isNightOrMorning ? new Date() : addDays(new Date(), 1);
-  const [trashNotifications, setTrashNotifications] = useAsyncStorage('trashNotifications', {});
+
+  const { loading, refresh, schedule, isScheduled, cancel } = useNotifications();
 
   return (
-    <ScrollView style={styles.scrollView}>
+    <ScrollView
+      contentContainerStyle={styles.scrollView}
+      refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+    >
       {config.trash.categories.map(category => (
         <View style={styles.trash} key={category.label}>
           <Text style={styles.text}>{category.label}:</Text>
@@ -48,11 +52,20 @@ const TrashScreen = () => {
             {formatDate(findNextDate({ startingFrom, ...category }))}
           </Text>
           <Switch
-            value={!!trashNotifications[category.label]}
+            value={isScheduled(category.label)}
             onValueChange={() => {
-              setTrashNotifications({
-                ...trashNotifications,
-                [category.label]: !trashNotifications[category.label],
+              if (isScheduled(category.label)) {
+                cancel(category.label);
+                return;
+              }
+              const nextDate = findNextDate({ startingFrom, ...category });
+              const dayBefore = subDays(nextDate, 1);
+              dayBefore.setHours(23);
+              const eveningBefore = startOfHour(dayBefore);
+              schedule({
+                id: category.label,
+                content: { title: `${category.label} trash is collected tomorrow morning` },
+                trigger: { date: eveningBefore },
               });
             }}
           />
@@ -64,7 +77,6 @@ const TrashScreen = () => {
 
 const styles = StyleSheet.create({
   scrollView: {
-    flex: 1,
   },
   trash: {
     flex: 1,

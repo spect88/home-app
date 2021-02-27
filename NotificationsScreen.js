@@ -1,57 +1,58 @@
-import React, { useState } from 'react';
-import { ScrollView, Text, View, Switch, Vibration, Platform, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  ScrollView,
+  RefreshControl,
+  Text,
+  View,
+  Switch,
+  Button,
+  StyleSheet,
+} from 'react-native';
 
+import useNotifications from './useNotifications';
 import config from './private/config.json';
-import useAsyncStorage from './useAsyncStorage';
-
-const vibrate = () => {
-  const pattern = Platform.select({
-    android: [
-      80, // wait
-      100, // vibrate
-      80, // wait
-      100, // vibrate
-      80, // wait
-      400, // vibrate
-    ],
-    ios: [
-      50, // wait, then 400 vibrate
-      100, // wait, then 400 vibrate
-    ],
-  });
-  if (!pattern) return;
-  Vibration.vibrate(pattern, true);
-};
 
 const NotificationsScreen = () => {
-  const [testing, setTesting] = useState(false);
-  const testFlip = () => {
-    if (testing) {
-      setTesting(false);
-      Vibration.cancel();
-    } else {
-      setTesting(true);
-      vibrate();
-    }
+  const { loading, refresh, schedule, isScheduled, cancel } = useNotifications();
+
+  const triggerTestNotification = () => {
+    schedule({
+      id: 'test',
+      content: {
+        title: 'Test notification',
+        body: 'This is the body',
+      },
+      trigger: { seconds: 1, repeats: false },
+    });
   };
-  const [notifications, setNotifications] = useAsyncStorage('customNotifications', {});
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
-      {config.notifications.custom.map(({ label }) => (
-        <View style={styles.row}>
+    <ScrollView
+      contentContainerStyle={styles.scrollView}
+      refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+    >
+      {config.notifications.map(({ label, trigger }) => (
+        <View style={styles.row} key={label}>
           <Text style={styles.text}>{label}</Text>
           <Switch
-            value={!!notifications[label]}
+            value={isScheduled(label)}
             onValueChange={() => {
-              setNotifications({ ...notifications, [label]: !notifications[label] });
+              if (isScheduled(label)) {
+                cancel(label);
+              } else {
+                schedule({
+                  id: label,
+                  content: { title: label },
+                  trigger,
+                });
+              }
             }}
           />
         </View>
       ))}
       <View style={styles.row}>
         <Text style={styles.text}>Notification test</Text>
-        <Switch value={testing} onValueChange={testFlip} />
+        <Button title="Test" onPress={() => triggerTestNotification()} />
       </View>
     </ScrollView>
   );
