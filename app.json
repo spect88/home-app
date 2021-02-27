@@ -18,14 +18,18 @@
     ],
     "privacy": "hidden",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "org.spect88.homeapp",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "useNextNotificationsApi": true
+      "useNextNotificationsApi": true,
+      "package": "org.spect88.homeapp",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
