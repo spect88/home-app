@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "home-app",
+    "name": "Home App",
     "slug": "home-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,6 +16,7 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "privacy": "hidden",
     "ios": {
       "supportsTablet": true
     },
